@@ -1,5 +1,3 @@
-# In this file we will convert from_zero.py file code into functions 
-import webbrowser
 import gdown
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -9,8 +7,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-import subprocess
-import requests
 import os
 import re
 import time
@@ -19,24 +15,15 @@ import shutil
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
 from config import USER_NAME, PASSWORD, COURSES_PAGE
+import json
 
-
-SKIP_PATTERNS = [
-    '/mod/forum/',
-    '/mod/quiz/',
-    '/mod/assign/view',
-    '/mod/feedback/',
-    '/mod/workshop/',
-]
+download_dir = os.path.join((os.getcwd()), "Downloads")
+LOG_FILE = 'download_history.json'
 
 def setup_chrome():
     try:
         options = Options()
         options.add_experimental_option("detach", True)
-
-        # Prepare the Download Folder
-        global download_dir 
-        download_dir = os.path.join(os.path.expanduser("~"), "Desktop", "University")
 
         try:
             if not os.path.exists(download_dir):
@@ -46,7 +33,6 @@ def setup_chrome():
             print(f"Error: Could not create download folder. {e}")
             return None
 
-        # 2. Set Browser Preferences
         prefs = {
             "download.default_directory": download_dir,
             "download.prompt_for_download": False,
@@ -54,13 +40,9 @@ def setup_chrome():
             "plugins.always_open_pdf_externally": True # Downloads PDF instead of opening in browser
         }
         options.add_experimental_option("prefs", prefs)
-        # run in the background without a window popping up and distracting
-        # options.add_argument("--headless")
 
-        # 3. Start the Browser with Driver Manager
         print("🚀 Starting Chrome... please wait.")
         try:
-            # This part is most likely to fail if the internet is down
             service = Service(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=options)
 
@@ -81,11 +63,11 @@ def setup_chrome():
 
 def login_navigate_to_courses(driver, USER_NAME, PASSWORD):
     try :
-        # 1. Try to open the website
+        # Try to open the website
         driver.get("https://el.sustech.edu")
         wait = WebDriverWait(driver, 10) # 10 for slower connections
 
-        # 2. Handle Login Fields
+        # Handle Login Fields
         print("📝 Attempting to enter credentials...")
         user_field = wait.until(EC.presence_of_element_located((By.ID, "username")))
         pass_field = wait.until(EC.presence_of_element_located((By.ID, "password")))
@@ -97,10 +79,9 @@ def login_navigate_to_courses(driver, USER_NAME, PASSWORD):
 
         wait.until(EC.element_to_be_clickable((By.ID, "loginbtn"))).click()
 
-        # 3. Check if login actually worked
+        # Check if login actually worked
         try:
             # wait for a Dashboard-only element
-            # For Moodle/Sustech, look for the 'User Menu' or 'Dashboard' heading
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".userbutton"))) 
             print("✅ Login successful!")
         except TimeoutException:
@@ -108,7 +89,7 @@ def login_navigate_to_courses(driver, USER_NAME, PASSWORD):
                 return False
 
         time.sleep(3)
-        # 4. Navigate to courses
+        # Navigate to courses
         driver.get(COURSES_PAGE)
 
         return True # Tell the rest of the script everything is okay
@@ -127,7 +108,8 @@ def login_navigate_to_courses(driver, USER_NAME, PASSWORD):
 
 def get_courses(driver):
         """Get list of all courses"""
-        print("📚 Fetching courses...")
+
+        print("📁 Fetching courses...")
         driver.get(COURSES_PAGE)
 
         WebDriverWait(driver, 15).until(
@@ -161,6 +143,9 @@ def download_plugin_files(driver):
     """
     Finds and downloads all links containing 'pluginfile.php' on the current page.
     """
+
+    history = get_history() # Load the logbook
+
     try:
         if "Download folder" in driver.page_source:
             download_btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Download folder')]")))
@@ -174,11 +159,20 @@ def download_plugin_files(driver):
         for link in links:
             try:
                 url = link.get_attribute("href")
+
+                raw_name = link.get_attribute("innerText").strip() or "Plugin_file"
+                clean_name = re.sub(r'[<>:"/\\|?*]', '_', raw_name) # SANITIZE: Remove characters Windows hates (< > : " / \ | ? *)
+
+                if url in history:
+                    print(f"⏭️ Already processed this URL: {history[url]}")
+                    continue
+
                 if url:
                     driver.get(url)
                     time.sleep(2)
             except StaleElementReferenceException:
                 continue
+            update_history(url, clean_name)
     except TimeoutException:
         pass
     except Exception as e:
@@ -187,7 +181,9 @@ def download_plugin_files(driver):
 
 
 def download_google_drive_files(driver):
-    # 1. Clear gdown cache to avoid cookie errors
+
+    history = get_history()
+    # Clear gdown cache to avoid cookie errors
     gdown_cache_file = os.path.expanduser('~/.cache/gdown/cookies.txt')
     if os.path.exists(gdown_cache_file):
         try:
@@ -199,49 +195,43 @@ def download_google_drive_files(driver):
         # Find all Google Drive links
         links = driver.find_elements(By.XPATH, "//a[contains(@href,'drive.google')]")
 
+        
         for link in links:
             url = link.get_attribute("href")
-            # Get the text (e.g., "Lecture_01.pptx" or "Video Guide")
-            raw_name = link.get_attribute("innerText").strip() or "GDrive_File"
 
-            # 2. SANITIZE: Remove characters Windows hates (< > : " / \ | ? *)
-            clean_name = re.sub(r'[<>:"/\\|?*]', '_', raw_name)
-            # Ensure the name ends with .mp4 if it's a video
-            # if not clean_name.lower().endswith('.mp4'):
-            #     clean_name = f"{clean_name}.mp4"
-            # else:
-            #     clean_name = clean_name
-            # 3. ARCHITECTURE CHOICE: Handle Extensions
-            # If the link text already has an extension (like .mp4), use it.
-            # If not, we don't add one and let the OS/gdown handle it.
-            if any(clean_name.lower().endswith(ext) for ext in ['.pdf', '.pptx', '.ppt', '.mp4', '.mp3', '.docx', '.txt']):
-                save_path = os.path.join(download_dir, clean_name)
-            else:
-                # If no extension is found, we can't guess, so we save it as is
-                # or you can default to .zip if you suspect folders.
-                save_path = os.path.join(download_dir, clean_name)
+            # ---- THE CHECK ----
+            if url in history:
+                print(f"⏭️ Already processed this URL: {history[url]}")
+                continue
+
+            # Get the text "Lecture_01.pptx"
+            raw_name = link.get_attribute("innerText").strip() or "GDrive_File"
+            clean_name = re.sub(r'[<>:"/\\|?*]', '_', raw_name) # SANITIZE: Remove characters Windows hates (< > : " / \ | ? *)
+
+            # If no extension is found, we can't guess, so we save it as is
+            save_path = os.path.join(download_dir, clean_name)
 
             print(f"🔽 Attempting to download: {clean_name}")
             try:
                 # fuzzy=True is key here as it converts /view and /edit links to download links
-                if "Cryptography" in clean_name: # This if will be removed
-                    continue
                 gdown.download(url, save_path, quiet=False, fuzzy=True)
             except Exception as e:
                 print(f"❌ Failed to download {clean_name}: {e}")
-                
+
+            update_history(url, clean_name)
+
     except Exception as e:
         print(f"🔎 Error scanning for Google Drive links: {e}")
 
 
-import re
-import urllib.parse
 
 def download_google_native_docs(driver):
     """
     Specifically handles Google Docs, Slides, and Sheets by converting 
     them into downloadable formats (PDF, PPTX, XLSX).
     """
+    history = get_history()
+
     try:
         # 1. Target only 'docs.google.com' links
         links = driver.find_elements(By.XPATH, "//a[contains(@href,'docs.google.com')]")
@@ -253,24 +243,26 @@ def download_google_native_docs(driver):
 
         for link in links:
             url = link.get_attribute("href")
+
+            if url in history:
+                print(f"⏭️ Already processed this URL: {history[url]}")
+                continue
+
             raw_name = link.get_attribute("innerText").strip() or "Untitled_Document"
 
             # Sanitize filename (remove Windows illegal characters)
             clean_name = re.sub(r'[<>:"/\\|?*]', '_', raw_name)
 
-            # 2. Identify the type and build the Export URL
-            if "/presentation/" in url:
-                # Presentation -> PowerPoint
+            # Identify the type and build the Export URL
+            if "/presentation/" in url:      # Presentation -> PowerPoint
                 export_url = url.split('/edit')[0] + "/export/pptx"
                 filename = f"{clean_name}.pptx"
             
-            elif "/document/" in url:
-                # Document -> PDF
+            elif "/document/" in url:         # Document -> PDF
                 export_url = url.split('/edit')[0] + "/export?format=pdf"
                 filename = f"{clean_name}.pdf"
             
-            elif "/spreadsheets/" in url:
-                # Spreadsheet -> Excel
+            elif "/spreadsheets/" in url:     # Spreadsheet -> Excel
                 export_url = url.split('/edit')[0] + "/export?format=xlsx"
                 filename = f"{clean_name}.xlsx"
             
@@ -288,71 +280,11 @@ def download_google_native_docs(driver):
             except Exception as e:
                 print(f"❌ Failed to export {filename}: {e}")
 
+            update_history(url, clean_name)
+
     except Exception as e:
         print(f"⚠️ Error in Google Docs function: {e}")
 
-# def save_video_links(driver, course_name):
-#     safe_name = "".join([c for c in course_name if c.isalnum() or c in (' ', '_')]).rstrip()
-#     file_path = os.path.join(download_dir, f"{safe_name}_video_links.txt")
-
-#     video_entries = []
-
-#     # 1. Find all links on the current activity page
-#     elements = driver.find_elements(By.TAG_NAME, "a")
-
-#     for el in elements:
-#         try:
-#             url = el.get_attribute("href")
-#             # Get the clickable text (e.g., "Chapter 3 Part 1")
-#             title = el.text.strip() or el.get_attribute("textContent").strip()
-
-#             if not url: continue
-
-#             url_lower = url.lower()
-
-#             # 2. Match and Format
-#             if "youtube.com/watch" in url_lower or "youtu.be/" in url_lower:
-#                 # Format: [Title] Youtube link => [URL]
-#                 video_entries.append(f"{title} Youtube link => {url}")
-
-#             if "pluginfile.php" in url_lower and ".mp4" in url_lower:
-#                 # Format: [Title] Browser video link => [URL]
-#                 video_entries.append(f"{title} Browser video link => {url}")
-
-#         except:
-#             continue
-
-#     source_tags = driver.find_elements(By.TAG_NAME, "source")
-#     for source in source_tags:
-#         try:
-#             src_url = source.get_attribute("src")
-#             if src_url and "pluginfile.php" in src_url:
-#                 # Since <source> has no text, we try to get the Page Title 
-#                 # or a nearby heading as the 'Title'
-#                 page_title = driver.title.split(":")[0].strip() 
-#                 video_entries.append(f"{page_title} (Embedded) Browser video link => {src_url}")
-#         except: continue
-
-#     # 3. Save to file (Append mode)
-#     if video_entries:
-#         # Avoid duplicate entries in the file
-#         existing_content = ""
-#         if os.path.exists(file_path):
-#             with open(file_path, "r", encoding="utf-8") as f:
-#                 existing_content = f.read()
-
-#         with open(file_path, "a", encoding="utf-8") as f:
-#             for entry in video_entries:
-#                 # Only write if this specific URL isn't already in the file
-#                 # We check the URL part specifically to be safe
-#                 link_url = entry.split("=> ")[1]
-#                 if link_url not in existing_content:
-#                     f.write(f"{entry}\n")
-#                     print(f"✅ Logged: {entry}")
-
-
-import re
-import os
 
 def save_video_links(driver, course_name):
     safe_name = "".join([c for c in course_name if c.isalnum() or c in (' ', '_')]).rstrip()
@@ -380,13 +312,11 @@ def save_video_links(driver, course_name):
         with open(file_path, "r", encoding="utf-8") as f:
             existing_urls = {line.split("=> ")[-1].strip() for line in f if "=> " in line}
 
-    # 1. Try to get the breadcrumb (usually contains the clean course name)
+    # Try to get the breadcrumb
     try:
         breadcrumb = driver.find_element(By.CSS_SELECTOR, "ol.breadcrumb").text
-        # Grab the last or second to last part of the breadcrumb
         page_label = breadcrumb.split('\n')[-1] 
     except:
-        # 2. Fallback to title but remove long ID numbers using Regex
         raw_title = driver.title
         page_label = re.sub(r'\d{10,}', '', raw_title).strip() # Removes any number 10 digits or longer
 
@@ -394,7 +324,7 @@ def save_video_links(driver, course_name):
     if not page_label or page_label == ":":
         page_label = "Course Video"
 
-    # 5. Save new findings
+    # Save new findings
     new_count = 0
     with open(file_path, "a", encoding="utf-8") as f:
         for url in all_found_urls:
@@ -422,13 +352,10 @@ def save_video_links(driver, course_name):
 
 
 def organize_downloads(course_name, semester_name="Semester !"):
-    # 1. Define the base path (Actual device storage)
-    # This creates a path like: C:/Users/YourName/Documents/University/Semester_1/Course_Name
     base_dir = os.path.join(os.path.expanduser("~"), "Desktop", "University", semester_name, course_name)
     temp_dir = os.path.abspath("downloads")
 
-    # 2. Define category logic
-    # Folders mapped to their extensions
+    # Define category logic
     extensions = {
         "PDFs": [".pdf"],
         "PPTs": [".pptx", ".ppt"],
@@ -439,7 +366,7 @@ def organize_downloads(course_name, semester_name="Semester !"):
 
     print(f"Sorting files for: {course_name}...")
 
-    # 3. Process every file in the temp downloads folder
+    # Process every file in the temp downloads folder
     for filename in os.listdir(temp_dir):
         file_path = os.path.join(temp_dir, filename)
         
@@ -447,14 +374,14 @@ def organize_downloads(course_name, semester_name="Semester !"):
         if not os.path.isfile(file_path):
             continue
 
-        # 4. Determine if it's a 'Lab' or 'Lecture' based on filename
+        # Determine if it's a 'Lab' or 'Lecture' based on filename
         category = "Lectures" # Default
         if "lab" in filename.lower() or "practical" in filename.lower() or "coding" in filename.lower() or "code" in filename.lower():
             category = "Labs"
         elif "assignment" in filename.lower() or "homework" in filename.lower():
             category = "Assignments"
 
-        # 5. Determine the file type folder (PDFs, PPTs, etc.)
+        # Determine the file type folder (PDFs, PPTs, etc.)
         file_ext = os.path.splitext(filename)[1].lower()
         sub_folder = "Other" # Default
         for folder_name, exts in extensions.items():
@@ -462,11 +389,11 @@ def organize_downloads(course_name, semester_name="Semester !"):
                 sub_folder = folder_name
                 break
 
-        # 6. Create the full destination path
+        # Create the full destination path
         final_destination_dir = os.path.join(base_dir, category, sub_folder)
         os.makedirs(final_destination_dir, exist_ok=True)
 
-        # 7. Move the file
+        # Move the file
         try:
             shutil.move(file_path, os.path.join(final_destination_dir, filename))
             print(f"✅ Moved: {filename} -> {category}/{sub_folder}")
@@ -549,6 +476,21 @@ def main():
             # If login failed, stop here so we don't get 'No links found' errors
             print("🚫 Script stopped because login was not successful.")
             driver.quit()
+
+
+
+def get_history():
+    if os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def update_history(url, file_name):
+    history = get_history()
+    history[url] = file_name
+    if os.path.exists(LOG_FILE):
+        with open(LOG_FILE, "w") as f:
+            json.dump(history, f, indent=4)
 
 
 if __name__ == "__main__":

@@ -39,18 +39,33 @@ def download_plugin_files(driver):
     try:
         if "Download folder" in driver.page_source:
             folder_url = driver.current_url.split('&')[0] # Clean the URL
+
             if folder_url in history:
                 print(f"⏭️ Already processed this URL: {history[url]}")
+                return
             else:
                 try :
+                    start_time = time.time()
+
                     download_btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Download folder')]")))
                     folder_name = driver.find_element(By.TAG_NAME, "h2").text.strip() or "Course_Folder"
 
                     print(f"⏳ Downloading folder ... waiting for completion.")
                     download_btn.click()
                     if wait_for_download_complete(download_dir):
-                        print("✅ Folder download complete.")
-                        update_history(folder_url, folder_name)
+                        success = False
+                        for filename in os.listdir(download_dir):
+                            file_full_path = os.path.join(download_dir, filename)
+                            # Check if file was modified in the last 10 seconds or since we started
+                            if os.path.getmtime(file_full_path) > start_time:
+                                success = True
+                                break
+                        
+                        if success:
+                            print("✅ Folder download verified on disk.")
+                            update_history(folder_url, folder_name)
+                        else:
+                            print("❌ Download was canceled or failed. Not logging to history.")
                     return
                 except:
                     pass

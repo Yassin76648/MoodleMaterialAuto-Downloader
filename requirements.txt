@@ -1,0 +1,21 @@
+# Moodle Automated Downloader - Requirements
+# Python 3.7+
+
+# Browser automation
+selenium==4.15.2
+webdriver-manager==4.0.1
+
+# Google Drive downloads
+gdown==4.7.1
+
+# HTTP requests (optional, for direct downloads)
+requests==2.31.0
+
+# File operations (built-in, listed for reference)
+# - os
+# - shutil
+# - json
+# - hashlib
+# - datetime
+# - time
+# - re

@@ -185,15 +185,21 @@ def organize_downloads(course_name, semester_name="Semester !"):
             final_destination_dir = os.path.join(base_dir, category, sub_folder)
 
         # Create the full destination path
-        final_destination_dir = os.path.join(base_dir, category, sub_folder)
         os.makedirs(final_destination_dir, exist_ok=True)
 
-        # Move the file
         try:
-            shutil.move(file_path, os.path.join(final_destination_dir, filename))
-            print(f"✅ Moved: {filename} -> {category}/{sub_folder}")
+            # Check if file already exists in destination to avoid errors
+            dest_path = os.path.join(final_destination_dir, filename)
+            if os.path.exists(dest_path):
+                # If it's the same file, just delete the temp one
+                os.remove(file_path)
+                print(f"♻️ Removed duplicate temp file: {filename}")
+            else:
+                shutil.move(file_path, dest_path)
+                print(f"✅ Moved: {filename} -> {os.path.relpath(final_destination_dir, base_dir)}")
         except Exception as e:
             print(f"❌ Error moving {filename}: {e}")
+
 
 
 def main():
@@ -227,7 +233,7 @@ def main():
                     print("🔍 Scanning main course dashboard for videos...")
                     save_video_links(driver, course_name)
 
-                    print("➡️ Navigate to first link in the course...")
+                    print("⏭️ Navigate to first link in the course...")
 
 
                     try :
@@ -256,7 +262,7 @@ def main():
                         save_video_links(driver, course_name)
                         # Check for next page
                         try:
-                            print("➡️ Next Page...")
+                            print("⏭️ Next Page...")
                             next_btn = driver.find_element(By.ID, "next-activity-link")
                             next_btn.click()
                         except NoSuchElementException:

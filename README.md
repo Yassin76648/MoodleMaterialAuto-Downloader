@@ -70,9 +70,9 @@ MoodleMaterialAuto-Downloader/
 ├── .gitignore                # Git ignore file
 ├── src/
 │   ├── main.py               # Entry point of the script
-    ├── config.py             # Your credentials (DO NOT COMMIT)
-    ├── downloaders.py        # Logic for downloading YouTube links, video links, and Moodle files
-    ├── logs_manager.py       # Contains functions that handle history downloads
+│   ├── config.py             # Your credentials (DO NOT COMMIT)
+│   ├── downloaders.py        # Logic for downloading YouTube links, video links, and Moodle files
+│   ├── logs_manager.py       # Contains functions that handle history downloads
 ├── Downloads/                # Temporary download location
 │   ├── lecture1.pdf
 │   ├── slides.pptx
@@ -86,7 +86,7 @@ MoodleMaterialAuto-Downloader/
             │   ├── PDFs/
             │   ├── PPTs/
             │   ├── ZIPs/
-            |   └── course_name_labs_video_links.txt
+            │   └── course_name_labs_video_links.txt
             └── Labs/
                 ├──PDFs/
                 ├── PPTs/
@@ -114,36 +114,146 @@ The script will:
 ### First Run Example
 
 ```
-🚀 Starting Chrome... please wait.
+================================================================================
+                        MOODLE AUTO DOWNLOADER
+================================================================================
+
+========================🚀 Starting Chrome... please wait ============================
 ✅ Chrome started successfully!
 📝 Attempting to enter credentials...
+
+======================================================================
 ✅ Login successful!
+======================================================================
 
-📚 Fetching courses...
-✅ Found 6 courses
+📁 Fetching courses...
+========================= ✅ Found 6 courses ==============================
+شبكات الحاسوب => https://el.sustech.edu/course/view.php?id=33090
+تفاعل الإنسان والحاسوب => https://el.sustech.edu/course/view.php?id=33088
+مبادئ علوم البيانات => https://el.sustech.edu/course/view.php?id=33091
+نظم التشغيل => https://el.sustech.edu/course/view.php?id=33087
+أساسيات الأعمال => https://el.sustech.edu/course/view.php?id=33085
+نظم إدارة قواعد البيانات => https://el.sustech.edu/course/view.php?id=33089
 
-==================================================
-COURSE: Data Structures
-==================================================
+===================== 🔁 Starting the download loop ==========================
+الفصل الخامس
+course : مبادئ علوم البيانات
+➡️ Navigate to first course...
+🔍 Scanning main course dashboard for videos...
+🎯 Lecture found: https://el.sustech.edu/pluginfile.php/609288/mod_label/intro/lab%204%20part%202.mp4
+🎯 Lecture found: https://el.sustech.edu/pluginfile.php/609287/mod_label/intro/lab%204%20part%201.mp4
+✅ Sorted 2 new links for مبادئ علوم البيانات
+⏭️ Navigate to first link in the course...
+⏭️ Next Page...
+⏭️ Next Page...
+⏭️ Next Page...
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: محاضرة المحتويات
+⏭️ Next Page...
+⏭️ Already processed this URL: Teaching Plan Data Science 25 (1).pdf
+⏭️ Next Page...
+⏭️ Already processed this URL: Data Mining Concepts and Techniques Reference.pdf
+⏭️ Next Page...
+An error occurred during the scanning process: cannot access local variable 'url' where it is not associated with a value
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/594050/mod_folder/content/0/lab%201%23.mp4
+✅ Sorted 1 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: مقدمة في علم البيانات
+⏭️ Next Page...
+⏭️ Already processed this URL: Python for Data Science.pdf
+⏭️ Next Page...
+⏳ Downloading folder ... waiting for completion.
+✅ Folder download complete.
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/606945/mod_folder/content/0/Lab2%20part2.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/606945/mod_folder/content/0/lab2%20part%203.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/606945/mod_folder/content/0/Lab2%20part1.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/606945/mod_folder/content/0/lab2%20part%205.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/606945/mod_folder/content/0/lab2%20part%204.mp4
+✅ Sorted 5 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الثالث
+⏭️ Next Page...
+⏭️ Already processed this URL: lab 2
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الرابع
+⏭️ Next Page...
+An error occurred during the scanning process: cannot access local variable 'url' where it is not associated with a value
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608563/mod_folder/content/0/lab%204.6.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608563/mod_folder/content/0/lab%204.3.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608563/mod_folder/content/0/lab%204.1.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608563/mod_folder/content/0/lab%204.5.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608563/mod_folder/content/0/lab%204.4.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608563/mod_folder/content/0/lab%204.2.mp4
+✅ Sorted 6 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الخامس
+⏭️ Next Page...
+⏭️ Already processed this URL: data science 5.pptx
+⏭️ Next Page...
+An error occurred during the scanning process: cannot access local variable 'url' where it is not associated with a value
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع السادس
+⏭️ Next Page...
+⏭️ Already processed this URL: data science lab 5.pptm
+⏭️ Next Page...
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/609292/mod_resource/content/0/lab%205%20part%201.mp4
+✅ Sorted 1 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/609293/mod_resource/content/0/lab%205%20part%202.mp4
+✅ Sorted 1 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/609294/mod_resource/content/0/lab%205%20part%203.mp4
+✅ Sorted 1 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/609295/mod_resource/content/0/lab%205%20part%204.mp4
+✅ Sorted 1 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+An error occurred during the scanning process: cannot access local variable 'url' where it is not associated with a value
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع السابع
+⏭️ Next Page...
+An error occurred during the scanning process: cannot access local variable 'url' where it is not associated with a value
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/615338/mod_folder/content/0/Recording%20%236.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/615338/mod_folder/content/0/Recording%20%236.1.mp4
+✅ Sorted 2 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الثامن
+⏭️ Next Page...
+An error occurred during the scanning process: cannot access local variable 'url' where it is not associated with a value
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/617882/mod_folder/content/0/lab7%20part1.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/617882/mod_folder/content/0/lab7%20part3.mp4
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/617882/mod_folder/content/0/lab7%20part2.mp4
+✅ Sorted 3 new links for مبادئ علوم البيانات
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع التاسع
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع العاشر
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الحادي عشر
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الثاني عشر
+⏭️ Next Page...
+📄 Found 1 Google Native documents. Converting...
+⏭️ Already processed this URL: الاسبوع الثالث عشر
+⏭️ Next Page...
+################## 🛑 Finished! ##################
 
-Reset tracking for 'Data Structures'? (y/N): n
-
-🔁 Starting the download loop...
-📅 Semester: Semester 1 - 2024
-
-──────────────────────────────────────────────
-Processing: Data Structures
-──────────────────────────────────────────────
-
-🔽 Attempting to download: lecture1.pdf
-📝 Tracked: lecture1.pdf
-✅ Moved: lecture1.pdf → Lectures/PDFs
-
-📊 Course Complete!
-   Total files tracked: 23
-   Total URLs processed: 45
-
-⏸️  Press Enter for next course...
+Sorting files for: مبادئ علوم البيانات...
+♻️ Removed duplicate temp file: مبادئ علوم البيانات_labs_video_links.txt
+♻️ Removed duplicate temp file: مبادئ علوم البيانات_lecture_video_links.txt
+Press Enter to launch next course :
 ```
 
 ## ⚙️ Configuration Options

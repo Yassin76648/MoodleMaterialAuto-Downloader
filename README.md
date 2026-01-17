@@ -65,13 +65,12 @@ COURSES_PAGE = "https://el.sustech.edu/my/courses.php"
 ```
 MoodleMaterialAuto-Downloader/
 │
-├── config.py                  # Your credentials (DO NOT COMMIT)
 ├── requirements.txt           # Python dependencies
 ├── README.md                  # This file
 ├── .gitignore                # Git ignore file
 ├── src/
 │   ├── main.py               # Entry point of the script
-    ├── config.py             # Configuration and environment variable loader
+    ├── config.py             # Your credentials (DO NOT COMMIT)
     ├── downloaders.py        # Logic for downloading YouTube links, video links, and Moodle files
     ├── logs_manager.py       # Contains functions that handle history downloads
 ├── Downloads/                # Temporary download location

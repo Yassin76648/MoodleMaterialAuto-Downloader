@@ -11,8 +11,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
-from config import USER_NAME, PASSWORD, COURSES_PAGE
-from downloaders import download_google_drive_files, download_google_native_docs, download_plugin_files, download_dir, save_video_links
+from src.config import USER_NAME, PASSWORD, COURSES_PAGE
+from src.downloaders import download_google_drive_files, download_google_native_docs, download_plugin_files, download_dir, save_video_links
 
 def setup_chrome():
     try:
@@ -135,7 +135,7 @@ def get_courses(driver):
             
             courses.append((course_name, url))
         
-        print(f"========================✅ Found {len(courses)} courses\n\n==============================")
+        print(f"========================= ✅ Found {len(courses)} courses ==============================")
         return courses
 
 
@@ -253,11 +253,11 @@ def main():
                             next_btn = driver.find_element(By.ID, "next-activity-link")
                             next_btn.click()
                         except NoSuchElementException:
-                            print("🛑 Finished!")
+                            print("################## 🛑 Finished! ##################\n")
                             break
 
                     organize_downloads(course_name, semester_name)
-                    input(f"Press Enter to launch next course : {course_name}")
+                    input(f"Press Enter to launch next course : ")
                     # driver.get(url)
 
         else:

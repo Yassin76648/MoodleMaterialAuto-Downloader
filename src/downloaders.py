@@ -1,17 +1,32 @@
+import os
+import re
+import time
+import os
 import gdown
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-import os
-import re
-import time
-import os
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
-from logs_manager import get_history, update_history
+from src.logs_manager import get_history, update_history
 
 download_dir = os.path.join((os.getcwd()), "Downloads")
+
+def wait_for_download_complete(directory, timeout=300):
+    """
+    Waits for all Chrome temporary download files (.crdownload) to disappear.
+    """
+    seconds = 0
+    while seconds < timeout:
+        # Check if any file in the directory ends with .crdownload
+        files = os.listdir(directory)
+        if not any(f.endswith('.crdownload') for f in files):
+            return True # Download complete
+        
+        time.sleep(1)
+        seconds += 1
+    return False # Timed out
 
 
 def download_plugin_files(driver):
@@ -23,11 +38,23 @@ def download_plugin_files(driver):
 
     try:
         if "Download folder" in driver.page_source:
-            download_btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Download folder')]")))
-            download_btn.click()
+            folder_url = driver.current_url.split('&')[0] # Clean the URL
+            if folder_url in history:
+                print(f"⏭️ Already processed this URL: {history[url]}")
+            else:
+                try :
+                    download_btn = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Download folder')]")))
+                    folder_name = driver.find_element(By.TAG_NAME, "h2").text.strip() or "Course_Folder"
 
-            time.sleep(5)
-            return
+                    print(f"⏳ Downloading folder ... waiting for completion.")
+                    download_btn.click()
+                    if wait_for_download_complete(download_dir):
+                        print("✅ Folder download complete.")
+                        update_history(folder_url, folder_name)
+                    return
+                except:
+                    pass
+
         # store every downloadable link that contains pluginfile.php
         links = driver.find_elements(By.XPATH, "//a[contains(@href,'pluginfile.php')]")
         # Download them
@@ -46,9 +73,14 @@ def download_plugin_files(driver):
                     continue
 
                 if url:
+                    print(f"📥 Starting download: {clean_name}")
                     driver.get(url)
+
+                if wait_for_download_complete(download_dir):
+                    print(f"✅ Download finished: {clean_name}")
                     update_history(url, clean_name)
-                    time.sleep(2)
+                else:
+                    print(f"⚠️ Warning: Download for {clean_name} timed out.")
             except StaleElementReferenceException:
                 continue
             

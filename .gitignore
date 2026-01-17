@@ -1,5 +1,5 @@
-__pycache__/
 *.pyc
 .env
 downloads/
-download_history/
+download_history.json
+**/__pycache__/

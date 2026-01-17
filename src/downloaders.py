@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import TimeoutException
-from src.logs_manager import get_history, update_history
+from logs_manager import get_history, update_history
 
 download_dir = os.path.join((os.getcwd()), "Downloads")
 
@@ -200,64 +200,61 @@ def download_google_native_docs(driver):
 
 def save_video_links(driver, course_name):
     safe_name = "".join([c for c in course_name if c.isalnum() or c in (' ', '_')]).rstrip()
-    file_path = os.path.join(download_dir, f"{safe_name}_video_links.txt")
-
-    # Get the entire HTML source of the page
-    page_source = driver.page_source
-
-    # Pattern for YouTube handles standard and short links
-    yt_pattern = r'https?://(?:www\.)?youtube\.com/watch\?v=[\w-]+|https?://youtu\.be/[\w-]+'
     
-    # Pattern for Pluginfile MP4s grabs the link until the .mp4 extension
+    # Define the two file paths
+    lab_path = os.path.join(download_dir, f"{safe_name}_labs_video_links.txt")
+    lec_path = os.path.join(download_dir, f"{safe_name}_lecture_video_links.txt")
+
+    page_source = driver.page_source
+    yt_pattern = r'https?://(?:www\.)?youtube\.com/watch\?v=[\w-]+|https?://youtu\.be/[\w-]+'
     plugin_pattern = r'https?://[^\s"\'<>]+pluginfile\.php/[^\s"\'<> ]+\.mp4'
 
-    # Find all matches
-    yt_matches = re.findall(yt_pattern, page_source)
-    plugin_matches = re.findall(plugin_pattern, page_source)
-    
-    # Combine them and remove duplicates
-    all_found_urls = list(set(yt_matches + plugin_matches))
+    all_found_urls = list(set(re.findall(yt_pattern, page_source) + re.findall(plugin_pattern, page_source)))
 
-    # Filter against existing links in your file
+    # Load existing URLs from BOTH files to prevent duplicates
     existing_urls = set()
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as f:
-            existing_urls = {line.split("=> ")[-1].strip() for line in f if "=> " in line}
+    for path in [lab_path, lec_path]:
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                existing_urls.update({line.split("=> ")[-1].strip() for line in f if "=> " in line})
 
-    # Try to get the breadcrumb
+    # Get Breadcrumb/Label logic
     try:
         breadcrumb = driver.find_element(By.CSS_SELECTOR, "ol.breadcrumb").text
         page_label = breadcrumb.split('\n')[-1] 
     except:
-        raw_title = driver.title
-        page_label = re.sub(r'\d{10,}', '', raw_title).strip() # Removes any number 10 digits or longer
+        page_label = re.sub(r'\d{10,}', '', driver.title).strip()
 
-    # If the label is still empty or messy, use a default
     if not page_label or page_label == ":":
         page_label = "Course Video"
 
-    # Save new findings
     new_count = 0
-    with open(file_path, "a", encoding="utf-8") as f:
-        for url in all_found_urls:
-            url_clean = url.strip()
-            if url_clean not in existing_urls:
-                # Since Regex doesn't give us the 'Title', we use a generic label
-                label = "Youtube link" if "youtu" in url_clean else "Browser video link"
-                
-            url_clean = url.strip()
-            if url_clean not in existing_urls:
-                # Try to find the title by looking for the anchor tag with this URL
-                try:
-                    link_element = driver.find_element(By.XPATH, f"//a[contains(@href, '{url_clean}')]")
-                    title = link_element.text.strip()
-                except:
-                    title = page_label # Fallback to the cleaned page title
-                
-                f.write(f"# {title} {label} => {url_clean}\n")
-                print(f"🎯 Regex found: {url_clean}")
-                new_count += 1
+    for url in all_found_urls:
+        url_clean = url.strip()
+        if url_clean not in existing_urls:
+            # Determine the Title
+            try:
+                link_element = driver.find_element(By.XPATH, f"//a[contains(@href, '{url_clean}')]")
+                title = link_element.text.strip()
+            except:
+                title = page_label 
+
+            label_type = "Youtube link" if "youtu" in url_clean else "Browser video link"
+            
+            # Categorization Logic
+            # check both the video title and the page label for "Lab" keywords
+            lab_keywords = ['lab', 'معمل', 'لاب', 'practical', 'تجربة']
+            is_lab = any(kw in title.lower() or kw in page_label.lower() for kw in lab_keywords)
+            
+            target_file = lab_path if is_lab else lec_path
+            
+            # Write to the specific file
+            with open(target_file, "a", encoding="utf-8") as f:
+                f.write(f"# {title} {label_type} => {url_clean}\n")
+            
+            print(f"🎯 {'Lab' if is_lab else 'Lecture'} found: {url_clean}")
+            existing_urls.add(url_clean) # Add to set so we don't save it twice in the same run
+            new_count += 1
 
     if new_count > 0:
-        print(f"✅ Added {new_count} new unique links to {safe_name}")
-
+        print(f"✅ Sorted {new_count} new links for {safe_name}")

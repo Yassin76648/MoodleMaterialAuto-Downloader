@@ -11,8 +11,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
-from src.config import USER_NAME, PASSWORD, COURSES_PAGE
-from src.downloaders import download_google_drive_files, download_google_native_docs, download_plugin_files, download_dir, save_video_links
+from config import USER_NAME, PASSWORD, COURSES_PAGE
+from downloaders import download_google_drive_files, download_google_native_docs, download_plugin_files, download_dir, save_video_links
 
 def setup_chrome():
     try:
@@ -149,7 +149,8 @@ def organize_downloads(course_name, semester_name="Semester !"):
         "PPTs": [".pptx", ".ppt"],
         "Videos": [".mp4", ".mkv", ".mov", ".avi"],
         "Audio": [".mp3", ".wav"],
-        "Documents": [".docx", ".doc", ".txt", ".xlsx"]
+        "Documents": [".docx", ".doc", ".txt", ".xlsx"],
+        "Zips": [".zip", ".rar", ".7z", ".tar", ".gz"], # New Category
     }
 
     print(f"Sorting files for: {course_name}...")
@@ -171,11 +172,17 @@ def organize_downloads(course_name, semester_name="Semester !"):
 
         # Determine the file type folder (PDFs, PPTs, etc.)
         file_ext = os.path.splitext(filename)[1].lower()
-        sub_folder = "Other" # Default
-        for folder_name, exts in extensions.items():
-            if file_ext in exts:
-                sub_folder = folder_name
-                break
+
+        # --- SPECIAL LOGIC FOR TXT FILES ---
+        if file_ext == ".txt":
+            final_destination_dir = os.path.join(base_dir, category)
+        else:
+            sub_folder = "Other"
+            for folder_name, exts in extensions.items():
+                if file_ext in exts:
+                    sub_folder = folder_name
+                    break
+            final_destination_dir = os.path.join(base_dir, category, sub_folder)
 
         # Create the full destination path
         final_destination_dir = os.path.join(base_dir, category, sub_folder)

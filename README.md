@@ -18,8 +18,6 @@ An intelligent Python automation tool that downloads and organizes all course ma
 - ✅ PDF documents
 - ✅ PowerPoint presentations (PPT, PPTX)
 - ✅ Word documents (DOC, DOCX)
-- ✅ Videos (MP4, AVI, MKV, MOV)
-- ✅ Audio files (MP3, WAV)
 - ✅ ZIP archives
 - ✅ Google Drive files
 - ✅ Google Docs/Slides/Sheets (converted to PDF/PPTX/XLSX)

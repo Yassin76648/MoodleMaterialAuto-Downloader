@@ -41,7 +41,7 @@ def download_plugin_files(driver):
             folder_url = driver.current_url.split('&')[0] # Clean the URL
 
             if folder_url in history:
-                print(f"⏭️ Already processed this URL: {history[url]}")
+                print(f"⏭️ Already processed this URL: {history[folder_url]}")
                 return
             else:
                 try :

@@ -114,30 +114,20 @@ The script will:
 ### First Run Example
 
 ```
-================================================================================
-                        MOODLE AUTO DOWNLOADER
-================================================================================
-
-========================🚀 Starting Chrome... please wait ============================
-✅ Chrome started successfully!
-📝 Attempting to enter credentials...
-
 ======================================================================
 ✅ Login successful!
 ======================================================================
-
 📁 Fetching courses...
 ========================= ✅ Found 6 courses ==============================
-أساسيات الأعمال => https://el.sustech.edu/course/view.php?id=33085
+نظم إدارة قواعد البيانات => https://el.sustech.edu/course/view.php?id=33089
 تفاعل الإنسان والحاسوب => https://el.sustech.edu/course/view.php?id=33088
+أساسيات الأعمال => https://el.sustech.edu/course/view.php?id=33085
+نظم التشغيل => https://el.sustech.edu/course/view.php?id=33087
 مبادئ علوم البيانات => https://el.sustech.edu/course/view.php?id=33091
 شبكات الحاسوب => https://el.sustech.edu/course/view.php?id=33090
-نظم التشغيل => https://el.sustech.edu/course/view.php?id=33087
-نظم إدارة قواعد البيانات => https://el.sustech.edu/course/view.php?id=33089
-
 ===================== 🔁 Starting the download loop ==========================
 الفصل الخامس
- course : أساسيات الأعمال
+ course : نظم إدارة قواعد البيانات
 ➡️ Navigate to first course...
 🔍 Scanning main course dashboard for videos...
 ⏭️ Navigate to first link in the course...
@@ -146,36 +136,95 @@ The script will:
 ⏭️ Next Page...
 ⏭️ Next Page...
 ⏭️ Next Page...
+📥 Starting download: Chapter14.pptx
+✅ Download finished: Chapter14.pptx
 ⏭️ Next Page...
-📥 Starting download: 0 1.pptx
-✅ Download finished: 0 1.pptx
+📥 Starting download: chapter14-part1.rar
+✅ Download finished: chapter14-part1.rar
 ⏭️ Next Page...
-📥 Starting download: Business Essentials 01 1.docx
-✅ Download finished: Business Essentials 01 1.docx
+📥 Starting download: Lecture No. 2.pptx
+✅ Download finished: Lecture No. 2.pptx
 ⏭️ Next Page...
-📥 Starting download: Business Essentials 002.docx
-✅ Download finished: Business Essentials 002.docx
+📥 Starting download: Chapter16.pptx
+✅ Download finished: Chapter16.pptx
 ⏭️ Next Page...
-📥 Starting download: Business Essentials 002.pptx
-✅ Download finished: Business Essentials 002.pptx
+📥 Starting download: Database Management Systems Lab-Lec1.pptx
+✅ Download finished: Database Management Systems Lab-Lec1.pptx
 ⏭️ Next Page...
-📥 Starting download: Business Essentials 03.pptx
-✅ Download finished: Business Essentials 03.pptx
 ⏭️ Next Page...
-📥 Starting download: Business Essentials 03.docx
-✅ Download finished: Business Essentials 03.docx
+📥 Starting download: Database Management Systems Lab_Assignment(1).pdf
+✅ Download finished: Database Management Systems Lab_Assignment(1).pdf
+📥 Starting download: Assignment (1).pdf
+✅ Download finished: Assignment (1).pdf
+⏭️ Next Page...
+📥 Starting download: Database Management Systems Lab-Lec2.pptx
+✅ Download finished: Database Management Systems Lab-Lec2.pptx
+⏭️ Next Page...
+⏭️ Next Page...
+📥 Starting download: Database Management Systems Lab_Assignment(2).pdf
+✅ Download finished: Database Management Systems Lab_Assignment(2).pdf
+📥 Starting download: Assignment (2).pdf
+✅ Download finished: Assignment (2).pdf
+⏭️ Next Page...
+📥 Starting download: Chapter17-part1.pptx
+✅ Download finished: Chapter17-part1.pptx
+⏭️ Next Page...
+📥 Starting download: Chapter17.pptx
+⚠️ Warning: Download for Chapter17.pptx timed out.
+⏭️ Next Page...
+📥 Starting download: Chapter17-part2.pptx
+⚠️ Warning: Download for Chapter17-part2.pptx timed out.
+⏭️ Next Page...
+📥 Starting download: DMS_let 4.pptx
+✅ Download finished: DMS_let 4.pptx
+⏭️ Next Page...
+🔽 Attempting to download: Database Management System Lab _lec4
+Downloading...
+From (original): https://drive.google.com/uc?id=1ZEgGeOVugQHkHm0cS8sHIBXLg-1PTPEf
+From (redirected): https://drive.google.com/uc?id=1ZEgGeOVugQHkHm0cS8sHIBXLg-1PTPEf&confirm=t&uuid=7bf88357-4883-472e-b2e9-aee89d818eb4       
+To: C:\Users\dell\Desktop\Python projects\automate downloder\Downloads\Database Management System Lab _lec4
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████| 340M/340M [06:41<00:00, 848kB/s]
+⏭️ Next Page...
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608519/mod_resource/content/1/DMSLAB_Lec3.mp4
+✅ Sorted 1 new links for نظم إدارة قواعد البيانات
+⏭️ Next Page...
+📥 Starting download: DMS_lec 3.pptx
+✅ Download finished: DMS_lec 3.pptx
+⏭️ Next Page...
+📥 Starting download: Database Management Systems Lab-Lec5.pptx
+✅ Download finished: Database Management Systems Lab-Lec5.pptx
+⏭️ Next Page...
+🎯 Lab found: https://el.sustech.edu/pluginfile.php/608836/mod_resource/content/1/4_5924870422343458393.mp4
+✅ Sorted 1 new links for نظم إدارة قواعد البيانات
+⏭️ Next Page...
+📥 Starting download: ExternalSort.pptx
+✅ Download finished: ExternalSort.pptx
+⏭️ Next Page...
+📥 Starting download: Database C Assignment.pdf
+✅ Download finished: Database C Assignment.pdf
 ⏭️ Next Page...
 ################## 🛑 Finished! ##################
-
-Sorting files for: أساسيات الأعمال...
-✅ Moved: 0 1.pptx -> Lectures\PPTs
-✅ Moved: Business Essentials 002.docx -> Lectures\Documents
-✅ Moved: Business Essentials 002.pptx -> Lectures\PPTs
-✅ Moved: Business Essentials 01 1.docx -> Lectures\Documents
-✅ Moved: Business Essentials 03.docx -> Lectures\Documents
-✅ Moved: Business Essentials 03.pptx -> Lectures\PPTs
-✅ Moved: تفاعل الإنسان والحاسوب_labs_video_links.txt -> Labs
-✅ Moved: تفاعل الإنسان والحاسوب_lecture_video_links.txt -> Lectures
+Sorting files for: نظم إدارة قواعد البيانات...
+✅ Moved: Assignment (1).pdf -> Assignments\PDFs
+✅ Moved: Assignment (2).pdf -> Assignments\PDFs
+✅ Moved: chapter14-part1.rar -> Lectures\Zips
+✅ Moved: Chapter14.pptx -> Lectures\PPTs
+✅ Moved: Chapter16.pptx -> Lectures\PPTs
+✅ Moved: Chapter17-part1.pptx -> Lectures\PPTs
+✅ Moved: Chapter17-part2.pptx -> Lectures\PPTs
+✅ Moved: Chapter17.pptx -> Lectures\PPTs
+✅ Moved: Database C Assignment.pdf -> Assignments\PDFs
+✅ Moved: Database Management System Lab _lec4 -> Labs\Other
+✅ Moved: Database Management Systems Lab-Lec1.pptx -> Labs\PPTs
+✅ Moved: Database Management Systems Lab-Lec2.pptx -> Labs\PPTs
+✅ Moved: Database Management Systems Lab-Lec5.pptx -> Labs\PPTs
+✅ Moved: Database Management Systems Lab_Assignment(1).pdf -> Labs\PDFs
+✅ Moved: Database Management Systems Lab_Assignment(2).pdf -> Labs\PDFs
+✅ Moved: DMS_lec 3.pptx -> Lectures\PPTs
+✅ Moved: DMS_let 4.pptx -> Lectures\PPTs
+✅ Moved: ExternalSort.pptx -> Lectures\PPTs
+✅ Moved: Lecture No. 2.pptx -> Lectures\PPTs
+✅ Moved: نظم إدارة قواعد البيانات_labs_video_links.txt -> Labs
 Press Enter to launch next course :
 ```
 
